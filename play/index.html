@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランダム音声プレーヤー</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>ランダム音声プレーヤー</h1>
+    <p>音声ファイルをランダムに再生します。</p>
+    <button id="play-random">ランダム再生を開始</button>
+    <p id="status"></p>
+    <audio id="audio-player" controls></audio>
+
+    <script>
+        // 音声ファイルリスト
+        const audioFiles = ["akinotano_output.mp3", "harusugite_output.mp3", "asibikino_output.mp3"]; // ここにファイル名を追加
+        let shuffledFiles = []; // ランダム順序の音声リスト
+        let currentIndex = 0; // 現在再生中のファイルのインデックス
+        const audioPlayer = document.getElementById("audio-player");
+        const status = document.getElementById("status");
+
+        // ランダムに並べ替える関数
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 再生管理関数
+        function playNext() {
+            if (currentIndex >= shuffledFiles.length) {
+                status.textContent = "全ての音声ファイルを再生しました。";
+                return;
+            }
+
+            const currentFile = shuffledFiles[currentIndex];
+            status.textContent = `再生中: ${currentFile}`;
+            audioPlayer.src = currentFile;
+            audioPlayer.play().then(() => {
+                console.log(`再生成功: ${currentFile}`);
+            }).catch((error) => {
+                console.error(`再生エラー: ${currentFile}`, error);
+            });
+
+            // 再生終了後に次のファイルを再生
+            audioPlayer.onended = () => {
+                currentIndex++;
+                setTimeout(playNext, 1000); // 1秒間隔を設けて次のファイルを再生
+            };
+        }
+
+        // 再生ボタンイベント
+        document.getElementById("play-random").addEventListener("click", () => {
+            shuffledFiles = shuffleArray([...audioFiles]); // ランダムに並べ替え
+            currentIndex = 0; // インデックスをリセット
+            status.textContent = "ランダム再生を開始します...";
+            playNext(); // 最初のファイルを再生
+        });
+    </script>
+</body>
+</html>
