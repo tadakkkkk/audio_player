@@ -10,9 +10,6 @@
             text-align: center;
             padding: 20px;
         }
-        audio {
-            margin: 20px 0;
-        }
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -23,62 +20,25 @@
 </head>
 <body>
     <h1>ランダム音声プレーヤー</h1>
-    <p>音声ファイルをランダムな順序で再生します。</p>
-
+    <p>音声ファイルをランダムに再生します。</p>
     <button id="play-random">ランダム再生を開始</button>
     <p id="status"></p>
-
-    <!-- オーディオプレーヤー（隠し要素として使用） -->
-    <audio id="audio-player" style="display: none;"></audio>
+    <audio id="audio-player" controls></audio>
 
     <script>
-        // 音声ファイルリスト
-       const audioFiles = ["akinotano_output.mp3", "harusugite_output.mp3", "asibikino_output.mp3"]; // ここにファイル名を追加
+          const audioFiles = ["akinotano_output.mp3", "harusugite_output.mp3", "asibikino_output.mp3"]; // ここにファイル名を追加
+        const audioPlayer = document.getElementById("audio-player");
+        const status = document.getElementById("status");
 
-
-        // ランダムに並べ替える関数
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // 再生管理関数
-        function playRandomFiles() {
-            const shuffledFiles = shuffleArray([...audioFiles]); // ランダムに並べ替え
-            const audioPlayer = document.getElementById("audio-player");
-            const status = document.getElementById("status");
-            let currentIndex = 0;
-
-            // 1秒間待って再生開始
-            status.textContent = "1秒後に再生を開始します...";
-            setTimeout(() => {
-                function playNext() {
-                    if (currentIndex >= shuffledFiles.length) {
-                        status.textContent = "全ての音声ファイルを再生しました。";
-                        return;
-                    }
-
-                    const currentFile = shuffledFiles[currentIndex];
-                    status.textContent = `再生中: ${currentFile}`;
-                    audioPlayer.src = currentFile;
-                    audioPlayer.play();
-
-                    audioPlayer.onended = () => {
-                        currentIndex++;
-                        setTimeout(playNext, 1000); // 1秒間隔を設けて次のファイルを再生
-                    };
-                }
-
-                playNext(); // 最初のファイルを再生
-            }, 1000); // 1秒待機して再生開始
-        }
-
-        // ボタンイベントリスナー
-        document.getElementById("play-random").addEventListener("click", playRandomFiles);
+        document.getElementById("play-random").addEventListener("click", () => {
+            // ファイルをランダムに選択
+            const randomFile = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+            audioPlayer.src = randomFile;
+            status.textContent = `再生中: ${randomFile}`;
+            audioPlayer.play().catch(error => {
+                console.error("再生エラー:", error);
+            });
+        });
     </script>
 </body>
 </html>
-
